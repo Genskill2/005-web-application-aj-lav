@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Grading",
+      "setup": "sudo -H pip3 install pytest; sudo -H pip install -r requirements.txt; sudo -H python setup.py develop",
+      "run": "pytest -v -s ",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 2,
+      "points": 1
+    }
+  ]
+}
