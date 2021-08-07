@@ -27,15 +27,21 @@ def dashboard():
     cursor = conn.cursor()
     oby = request.args.get("order_by", "id") # TODO. This is currently not used. 
     order = request.args.get("order", "asc")
-    if order == "asc":
-        cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.id")
+    if oby == "species":				
+    	if order == "asc":
+    		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by s.name")
+    	else:
+    		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by s.name desc")
     else:
-        cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.id desc")
+    	if order == "asc":
+    		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.{oby}")
+    	else:
+    		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.{oby} desc")
     pets = cursor.fetchall()
     return render_template('index.html', pets = pets, order="desc" if order=="asc" else "asc")
 
 
-@bp.route("/<pid>")
+@bp.route("/<int:pid>")
 def pet_info(pid): 
     conn = db.get_db()
     cursor = conn.cursor()
@@ -74,7 +80,7 @@ def edit(pid):
     elif request.method == "POST":
         description = request.form.get('description')
         sold = request.form.get("sold")
-        # TODO Handle sold
+        print(solds)
         return redirect(url_for("pets.pet_info", pid=pid), 302)
         
     
