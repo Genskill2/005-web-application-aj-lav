@@ -19,7 +19,11 @@ def format_date(d):
 @bp.route("/search/<field>/<value>")
 def search(field, value):
     # TBD
-    return ""
+    conn = db.get_db()
+    cursor = conn.cursor()
+    cursor.execute("select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s, tags_pets tp, tag t where p.species = s.id and t.id = tp.tag and tp.pet =p.id and t.name =?", [value])
+    pets = cursor.fetchall()
+    return render_template('search.html', pets=pets)
 
 @bp.route("/")
 def dashboard():
@@ -27,6 +31,8 @@ def dashboard():
     cursor = conn.cursor()
     oby = request.args.get("order_by", "id") # TODO. This is currently not used. 
     order = request.args.get("order", "asc")
+    ## task 1 -- Begin
+    ## to sort based on all fields.
     if oby == "species":				
     	if order == "asc":
     		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by s.name")
@@ -37,6 +43,7 @@ def dashboard():
     		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.{oby}")
     	else:
     		cursor.execute(f"select p.id, p.name, p.bought, p.sold, s.name from pet p, animal s where p.species = s.id order by p.{oby} desc")
+    ## task 1 -- End
     pets = cursor.fetchall()
     return render_template('index.html', pets = pets, order="desc" if order=="asc" else "asc")
 
@@ -80,7 +87,7 @@ def edit(pid):
     elif request.method == "POST":
         description = request.form.get('description')
         sold = request.form.get("sold")
-        print(solds)
+        print(sold)
         return redirect(url_for("pets.pet_info", pid=pid), 302)
         
     
